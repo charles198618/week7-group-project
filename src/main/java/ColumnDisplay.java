@@ -20,5 +20,30 @@ public class ColumnDisplay {
         else if (lines.size() <= 10) numCols = 2;
         else if (lines.size() <= 50) numCols = ((lines.size() - 1) / 10) + 1;
         else numCols = 6;
+
+        int numRows = (int) Math.ceil((double) lines.size() / numCols);
+        List<String> finalLines = lines;
+        List<List<String>> columns = IntStream.range(0, numCols)
+                .mapToObj(i -> finalLines.subList(i * numRows, Math.min((i + 1) * numRows, finalLines.size())))
+                .collect(Collectors.toList());
+
+        System.out.println(printColumns(numRows, columns));
+    }
+
+    // prints columns
+    public static String printColumns(int numRows, List<List<String>> columns) {
+        return IntStream.range(0, numRows)
+                .mapToObj(rowIndex -> getRow(columns, rowIndex) + "\n")
+                .collect(Collectors.joining());
+    }
+
+    // gets each row
+    public static String getRow(List<List<String>> columns, int rowIndex){
+        return columns.stream()
+                .map(column -> {
+                    String element = (rowIndex < column.size()) ? column.get(rowIndex) : "";
+                    return String.format("%-15s", element);
+                })
+                .collect(Collectors.joining());
     }
 }
