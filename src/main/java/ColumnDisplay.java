@@ -1,4 +1,3 @@
-
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -22,28 +21,23 @@ public class ColumnDisplay {
         else numCols = 6;
 
         int numRows = (int) Math.ceil((double) lines.size() / numCols);
-        List<String> finalLines = lines;
-        List<List<String>> columns = IntStream.range(0, numCols)
-                .mapToObj(i -> finalLines.subList(i * numRows, Math.min((i + 1) * numRows, finalLines.size())))
+
+        // translator: 'lines' broken to a stream, feeding translator line by line
+        // outputs List<List<Integer, String>> of line and numerical equivalent in 'combinedList'
+        List<List<Object>> combinedList = lines.stream()
+                .map(ColumnDisplay::translator)
                 .collect(Collectors.toList());
 
-        System.out.println(printColumns(numRows, columns));
-    }
+        // sort combinedList by numerical equivalent
+        quickSort(combinedList, 0, combinedList.size() - 1);
 
-    // prints columns
-    public static String printColumns(int numRows, List<List<String>> columns) {
-        return IntStream.range(0, numRows)
-                .mapToObj(rowIndex -> getRow(columns, rowIndex) + "\n")
-                .collect(Collectors.joining());
-    }
+        // set finalLines equal to the sorted list of words and isolate from numerical equivalents
+        List<String> finalLines = combinedList.stream()
+                .map(combo -> combo.stream()
+                        .reduce((a, b) -> b)
+                        .orElse(List.of("")))
+                .map(Object::toString)
+                .collect(Collectors.toList());
 
-    // gets each row
-    public static String getRow(List<List<String>> columns, int rowIndex){
-        return columns.stream()
-                .map(column -> {
-                    String element = (rowIndex < column.size()) ? column.get(rowIndex) : "";
-                    return String.format("%-15s", element);
-                })
-                .collect(Collectors.joining());
     }
 }
