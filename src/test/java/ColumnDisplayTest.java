@@ -26,3 +26,15 @@ class ColumnDisplayTest {
         assertEquals("[2, Two]", ColumnDisplay.translator(s2).toString());
 
     }
+    @Test
+    public void testMissingInputFile() {
+        File file = new File("./input.txt");
+        assertTrue(file.exists(), "File does not exist");
+    }
+
+
+    @AfterEach
+    void tearDown() {
+    }
+}
+
