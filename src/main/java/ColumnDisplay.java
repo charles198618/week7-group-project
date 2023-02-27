@@ -100,5 +100,105 @@ public class ColumnDisplay {
             lineList.set(0, "-");
         }
 
+        // This code block converts a line to its numerical equivalent, "num"
+        int num = 0; // num equivalent of line
+
+        // keeps track of num since last "thousand", "million", and "billon".
+        // handles situations where there is a hundred multiplied by "thousand", "million", or "billion", for example 502 thousand, 610 million
+        int subNum = 0;
+
+        for (int i = 0; i < lineList.size(); i++) {
+            // provide a value of 0 to any "ands" or "-" found in the line
+            if (lineList.get(i).equalsIgnoreCase("and") || lineList.get(i).equals("-")) {
+                numList.add(0);
+                continue;
+            }
+
+            // find the numeric value of a word from the hashmap.
+            if (map.containsKey(lineList.get(i))) numList.add(map.get(lineList.get(i)));
+
+            // all words' values will be added to num. If the program comes across a hundred, a thousand, a million, or a billion,
+            // it will be multiplied by its predecessor instead. For example five thousand is 5 * 1000
+            if (numList.get(i) == 100 || numList.get(i) == 1000 || numList.get(i) == 1000000 || numList.get(i) == 1000000000) {
+                num -= numList.get(i-1);
+                num += numList.get(i) * numList.get(i - 1);
+
+                subNum -= numList.get(i-1);
+
+                // if element is a hundred, multiply previous element by 100 and add it to subNum just like with num
+                if (numList.get(i) == 100) {
+                    subNum += 100 * numList.get(i-1);
+                }
+
+                // if element is a thousand, a million, or a billion, undo previous addition and add (subNum * thousand/million/billion) to num instead. Reset subNum
+                if (numList.get(i) != 100) {
+                    num = (num - subNum) + (subNum * numList.get(i));
+                    subNum = 0;
+                }
+            } else {
+                num += numList.get(i);
+                subNum += numList.get(i);
+            }
+        }
+
+        // if the word was supposed to be negative, convert the num to be negative
+        if (lineList.contains("-")) {
+            num -= 2 * num;
+        }
+
+        // return list of the line and its numerical equivalent
+        return new ArrayList<>(Arrays.asList(num, line));
+    }
+
+    public static List<List<Object>> quickSort(List<List<Object>> combinedList, int low, int high)
+    {
+        // list not empty nor size of 1
+        if (low < high) {
+            // get the pivot element from the end of the list
+            int pivot = (int) combinedList.get(high).get(0);
+
+            // make left < pivot and right > pivot
+            int i = low - 1;
+            for (int j=low; j < high; j++) {
+                // check if current element is less than the pivot
+                if ((int) combinedList.get(j).get(0) < pivot) {
+                    i++;
+                    // swap elements at i and j
+                    swap(combinedList, i, j);
+                }
+            }
+            swap(combinedList, i + 1, high);
+
+            pivot = i + 1;
+
+            // do same operation as above recursively to sort two sub arrays
+            quickSort(combinedList, low, pivot - 1);
+            quickSort(combinedList, pivot + 1, high);
+        }
+        return combinedList;
+    }
+
+    public static void swap (List<List<Object>> combinedList, int i, int j)
+    {
+        List<Object> temp = combinedList.get(i);
+        combinedList.set(i, combinedList.get(j));
+        combinedList.set(j, temp);
+    }
+
+    // prints columns
+    public static String printColumns(int numRows, List<List<String>> columns) {
+        return IntStream.range(0, numRows)
+                .mapToObj(rowIndex -> getRow(columns, rowIndex) + "\n")
+                .collect(Collectors.joining());
+    }
+
+    // gets each row
+    public static String getRow(List<List<String>> columns, int rowIndex){
+        return columns.stream()
+                .map(column -> {
+                    String element = (rowIndex < column.size()) ? column.get(rowIndex) : "";
+                    return String.format("%-30s", element);
+                })
+                .collect(Collectors.joining());
     }
 }
