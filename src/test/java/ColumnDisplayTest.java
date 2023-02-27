@@ -15,3 +15,14 @@ class ColumnDisplayTest {
     void setUp() {
         columnDisplay = new ColumnDisplay();
     }
+
+    @Test
+    void translator() {
+        String s = "Zero";
+        String s1 = "One";
+        String s2 = "Two";
+        assertEquals("[0, Zero]", ColumnDisplay.translator(s).toString());
+        assertEquals("[1, One]", ColumnDisplay.translator(s1).toString());
+        assertEquals("[2, Two]", ColumnDisplay.translator(s2).toString());
+
+    }
